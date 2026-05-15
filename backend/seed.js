@@ -1,0 +1,127 @@
+const fs = require('fs')
+const path = require('path')
+
+const DB_PATH = path.join(__dirname, 'data', 'db.json')
+
+const data = {
+  categories: [
+    { id: 1, name: 'Electrónica' },
+    { id: 2, name: 'Ropa' },
+    { id: 3, name: 'Hogar' },
+    { id: 4, name: 'Deportes' },
+    { id: 5, name: 'Libros' }
+  ],
+  products: [
+    {
+      id: 1,
+      name: 'Auriculares Bluetooth',
+      description: 'Auriculares inalámbricos con cancelación de ruido y 30h de batería.',
+      price: 59.99,
+      imageUrl: 'https://placehold.co/400x300?text=Auriculares',
+      categoryId: 1,
+      stock: 25
+    },
+    {
+      id: 2,
+      name: 'Smartwatch Deportivo',
+      description: 'Reloj inteligente con GPS, monitor de frecuencia cardíaca y resistencia al agua.',
+      price: 129.99,
+      imageUrl: 'https://placehold.co/400x300?text=Smartwatch',
+      categoryId: 1,
+      stock: 10
+    },
+    {
+      id: 3,
+      name: 'Teclado Mecánico RGB',
+      description: 'Teclado mecánico con switches Cherry MX, retroiluminación RGB y reposamuñecas.',
+      price: 89.99,
+      imageUrl: 'https://placehold.co/400x300?text=Teclado',
+      categoryId: 1,
+      stock: 18
+    },
+    {
+      id: 4,
+      name: 'Camiseta Running',
+      description: 'Camiseta técnica de secado rápido para actividad física intensa.',
+      price: 19.99,
+      imageUrl: 'https://placehold.co/400x300?text=Camiseta',
+      categoryId: 2,
+      stock: 50
+    },
+    {
+      id: 5,
+      name: 'Chaqueta Impermeable',
+      description: 'Chaqueta ligera resistente al viento y la lluvia, ideal para trekking.',
+      price: 89.99,
+      imageUrl: 'https://placehold.co/400x300?text=Chaqueta',
+      categoryId: 2,
+      stock: 15
+    },
+    {
+      id: 6,
+      name: 'Zapatillas Trail',
+      description: 'Calzado de montaña con suela grip y plantilla acolchada.',
+      price: 74.99,
+      imageUrl: 'https://placehold.co/400x300?text=Zapatillas',
+      categoryId: 2,
+      stock: 22
+    },
+    {
+      id: 7,
+      name: 'Lámpara de Escritorio LED',
+      description: 'Lámpara con intensidad y temperatura de color ajustables, puerto USB integrado.',
+      price: 34.99,
+      imageUrl: 'https://placehold.co/400x300?text=Lampara',
+      categoryId: 3,
+      stock: 30
+    },
+    {
+      id: 8,
+      name: 'Set de Sartenes Antiadherentes',
+      description: 'Juego de 3 sartenes de acero forjado con recubrimiento antiadherente de última generación.',
+      price: 49.99,
+      imageUrl: 'https://placehold.co/400x300?text=Sartenes',
+      categoryId: 3,
+      stock: 12
+    },
+    {
+      id: 9,
+      name: 'Pelota de Fútbol',
+      description: 'Pelota oficial tamaño 5, apta para césped natural y artificial.',
+      price: 24.99,
+      imageUrl: 'https://placehold.co/400x300?text=Pelota',
+      categoryId: 4,
+      stock: 40
+    },
+    {
+      id: 10,
+      name: 'Mancuernas Ajustables 20 kg',
+      description: 'Par de mancuernas con discos intercambiables, de 2 kg a 20 kg por unidad.',
+      price: 119.99,
+      imageUrl: 'https://placehold.co/400x300?text=Mancuernas',
+      categoryId: 4,
+      stock: 8
+    },
+    {
+      id: 11,
+      name: 'Clean Code',
+      description: 'Libro de Robert C. Martin sobre principios y prácticas de código limpio.',
+      price: 32.99,
+      imageUrl: 'https://placehold.co/400x300?text=CleanCode',
+      categoryId: 5,
+      stock: 35
+    },
+    {
+      id: 12,
+      name: 'El Proyecto Fénix',
+      description: 'Novela sobre gestión de TI, DevOps y cultura de mejora continua.',
+      price: 27.99,
+      imageUrl: 'https://placehold.co/400x300?text=Fenix',
+      categoryId: 5,
+      stock: 20
+    }
+  ]
+}
+
+fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2))
+console.log(`Semilla aplicada: ${data.categories.length} categorías, ${data.products.length} productos.`)
