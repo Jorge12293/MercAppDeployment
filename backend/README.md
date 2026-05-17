@@ -14,11 +14,6 @@ Sistema de inventario desarrollado con Node.js, Express y MongoDB siguiendo el p
 | Ciclo | Cuarto Ciclo |
 | Institución | Universidad Politécnica Salesiana (UPS) |
 
-## Repositorio
-
-[https://github.com/jorgerivera12/mi_inventario_express.git](https://github.com/jorgerivera12/mi_inventario_express.git)
-
----
 
 ## Funcionalidades Implementadas
 

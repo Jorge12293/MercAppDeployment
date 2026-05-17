@@ -1,30 +1,28 @@
 const categoryService = require('../../services/categoryService');
 
-function toApi(c) {
-  return { id: c._id, name: c.nombre };
-}
-
+// Lista todas las categorías ordenadas por nombre
 exports.getAll = async (req, res, next) => {
   try {
     const categorias = await categoryService.findAll();
-    res.json(categorias.map(toApi));
+    res.json(categorias.map(categoryService.serialize));
   } catch (err) { next(err); }
 };
 
+// Crea una categoría; rechaza duplicados con 400 en lugar de dejar explotar el índice único
 exports.create = async (req, res, next) => {
   try {
     const { name } = req.body;
     if (!name || typeof name !== 'string' || name.trim() === '')
       return res.status(400).json({ error: 'name es obligatorio' });
     const categoria = await categoryService.create(name);
-    res.status(201).json(toApi(categoria));
+    res.status(201).json(categoryService.serialize(categoria));
   } catch (err) {
-    // 11000 es el código de error de índice único duplicado en MongoDB
     if (err.code === 11000) return res.status(400).json({ error: 'Ya existe una categoría con ese nombre' });
     next(err);
   }
 };
 
+// Elimina la categoría por id; retorna 404 si no existía
 exports.remove = async (req, res, next) => {
   try {
     const deleted = await categoryService.remove(req.params.id);

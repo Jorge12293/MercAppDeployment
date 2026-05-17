@@ -1,7 +1,8 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const Categoria = require('./models/Categoria');
-const Producto = require('./models/Producto');
+const Producto  = require('./models/Producto');
+const Usuario   = require('./models/Usuario');
 
 const categorias = [
   'Electrónica',
@@ -51,6 +52,11 @@ async function seed() {
 
   const productoDocs = await Producto.insertMany(productosConId);
   console.log(`${productoDocs.length} productos insertados`);
+
+  // Elimina el usuario admin si ya existe y lo recrea para garantizar contraseña fresca
+  await Usuario.deleteOne({ email: 'admin@gmail.com' });
+  await Usuario.create({ nombre: 'Admin', email: 'admin@gmail.com', password: '123456' });
+  console.log('Usuario admin creado → admin@gmail.com / 123456');
 
   await mongoose.disconnect();
   console.log('Listo.');

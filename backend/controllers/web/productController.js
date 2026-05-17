@@ -1,15 +1,18 @@
 const { validationResult } = require('express-validator');
 const productService = require('../../services/productService');
 
+// Muestra la lista de todos los productos ordenada por fecha de creación descendente
 exports.listar = async (req, res) => {
   const productos = await productService.findAll({});
   res.render('productos/lista', { title: 'Productos', productos });
 };
 
+// Renderiza el formulario de creación vacío
 exports.formNuevo = (req, res) => {
   res.render('productos/nuevo', { title: 'Nuevo Producto' });
 };
 
+// Valida la imagen subida y los campos del form antes de persistir el producto
 exports.crear = async (req, res) => {
   if (req.uploadError) {
     return res.render('productos/nuevo', {
@@ -32,12 +35,14 @@ exports.crear = async (req, res) => {
   res.redirect('/productos');
 };
 
+// Carga el producto existente para pre-rellenar el formulario de edición
 exports.formEditar = async (req, res) => {
   const producto = await productService.findById(req.params.id);
   if (!producto) return res.redirect('/productos');
   res.render('productos/editar', { title: 'Editar Producto', producto });
 };
 
+// Persiste los cambios; conserva la imagen anterior si no se sube una nueva
 exports.actualizar = async (req, res) => {
   if (req.uploadError) {
     const producto = await productService.findById(req.params.id);
@@ -63,6 +68,7 @@ exports.actualizar = async (req, res) => {
   res.redirect('/productos');
 };
 
+// Elimina el producto sin confirmación adicional; la vista maneja el confirm del lado cliente
 exports.eliminar = async (req, res) => {
   await productService.remove(req.params.id);
   res.redirect('/productos');

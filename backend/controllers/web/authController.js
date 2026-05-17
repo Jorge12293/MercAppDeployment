@@ -3,10 +3,12 @@ const authService = require('../../services/authService');
 
 const LAYOUT_AUTH = { layout: 'auth' };
 
+// Renderiza el formulario de registro vacío
 exports.formRegistro = (req, res) => {
   res.render('auth/registro', { title: 'Registro', ...LAYOUT_AUTH });
 };
 
+// Valida el body, verifica unicidad de email y crea el usuario
 exports.registro = async (req, res) => {
   const errores = validationResult(req);
   if (!errores.isEmpty()) {
@@ -33,10 +35,12 @@ exports.registro = async (req, res) => {
   }
 };
 
+// Renderiza el formulario de login vacío
 exports.formLogin = (req, res) => {
   res.render('auth/login', { title: 'Iniciar sesión', ...LAYOUT_AUTH });
 };
 
+// Autentica al usuario, guarda datos mínimos en sesión y redirige al dashboard
 exports.login = async (req, res) => {
   const errores = validationResult(req);
   if (!errores.isEmpty()) {
@@ -52,7 +56,7 @@ exports.login = async (req, res) => {
     if (!valido) {
       return res.render('auth/login', { title: 'Iniciar sesión', ...LAYOUT_AUTH, errores: [{ msg: 'Credenciales incorrectas' }], body: req.body });
     }
-    req.session.usuarioId    = usuario._id;
+    req.session.usuarioId     = usuario._id;
     req.session.usuarioNombre = usuario.nombre;
     req.session.usuarioEmail  = usuario.email;
     res.redirect('/productos');
@@ -65,6 +69,7 @@ exports.login = async (req, res) => {
   }
 };
 
+// Destruye la sesión del servidor y redirige al login
 exports.logout = (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
 };

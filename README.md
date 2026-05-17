@@ -2,6 +2,8 @@
 
 Aplicación de comercio electrónico de página única (SPA) construida con Vue 3 en el frontend y Express en el backend. Permite explorar un catálogo de productos, filtrarlos por categoría o precio, ver el detalle de cada uno y gestionarlos a través de un CRUD completo.
 
+**Repositorio:** [https://github.com/jorgerivera12/MercAppV1.git](https://github.com/jorgerivera12/MercAppV1.git)
+
 ---
 
 ## Arquitectura general
@@ -37,45 +39,104 @@ El frontend corre en el puerto **5173** (Vite dev server) y hace proxy de todas 
 MercApp/
 │
 ├── backend/
-│   ├── app.js                  Configura Express y monta routers
-│   ├── server.js               Punto de entrada — arranca en puerto 3000
-│   ├── seed.js                 Script para poblar db.json con datos de prueba
+│   ├── app.js                      Configura Express, middlewares, rutas y Socket.io
+│   ├── seed.js                     Puebla la BD con categorías, productos y usuario admin
 │   │
-│   ├── data/
-│   │   └── db.json             Base de datos JSON (categorías + productos)
+│   ├── config/
+│   │   └── database.js             Conecta a MongoDB vía MONGO_URI
 │   │
-│   ├── lib/
-│   │   ├── db.js               Helpers readDB / writeDB / nextId
-│   │   └── hashids.js          Codificación de IDs expuestos en URLs
+│   ├── controllers/
+│   │   ├── api/                    Handlers JSON — responden con res.json()
+│   │   │   ├── cartController.js   GET/POST/PUT/DELETE del carrito en sesión
+│   │   │   ├── categoryController.js  Listado y gestión de categorías
+│   │   │   └── productController.js   CRUD completo de productos
+│   │   │
+│   │   └── web/                    Handlers SSR — responden con res.render()
+│   │       ├── authController.js   Registro, login y logout
+│   │       ├── indexController.js  Dashboard y perfil de usuario
+│   │       └── productController.js  CRUD de productos (vistas Handlebars)
 │   │
-│   └── routes/
-│       ├── products.js         CRUD completo de productos
-│       ├── categories.js       Listado de categorías
-│       └── cart.js             Endpoints de carrito (referencia, no usados por el cliente actual)
+│   ├── middleware/
+│   │   ├── autenticado.js          Protege rutas web; redirige a /login si no hay sesión
+│   │   ├── upload.js               Multer — guarda imágenes en uploads/
+│   │   ├── validarAuth.js          Reglas express-validator para registro y login
+│   │   └── validarProducto.js      Reglas express-validator para el formulario de producto
+│   │
+│   ├── models/
+│   │   ├── Categoria.js            Schema Mongoose de categoría
+│   │   ├── Producto.js             Schema Mongoose de producto (ref a Categoria)
+│   │   └── Usuario.js              Schema Mongoose de usuario (bcrypt pre-save)
+│   │
+│   ├── routes/
+│   │   ├── api/                    Prefijo /api — devuelven JSON
+│   │   │   ├── cart.js             /api/cart
+│   │   │   ├── categories.js       /api/categories
+│   │   │   └── products.js         /api/products
+│   │   │
+│   │   └── web/                    Sin prefijo — renderizan vistas
+│   │       ├── auth.js             /login, /registro, /logout
+│   │       ├── index.js            /, /perfil
+│   │       └── products.js         /productos
+│   │
+│   ├── services/                   Lógica de negocio; los controllers no tocan modelos directamente
+│   │   ├── authService.js          CRUD de usuarios y comparación de contraseña
+│   │   ├── cartService.js          Manejo del carrito en sesión Express
+│   │   ├── categoryService.js      Consultas y serialización de categorías
+│   │   └── productService.js       Consultas, validación y serialización de productos
+│   │
+│   ├── socket/
+│   │   └── chat.js                 Lógica completa de chat en tiempo real (Socket.io)
+│   │
+│   ├── utils/                      Funciones puras — sin Express, sin side effects
+│   │   ├── mongo.js                isValidId — validación de ObjectId compartida
+│   │   ├── serializers.js          Mapeo de docs Mongoose al shape público de la API
+│   │   └── validators.js           Validación y traducción de campos para productos
+│   │
+│   ├── public/
+│   │   ├── css/style.css           Estilos del panel web
+│   │   └── js/                     Scripts del cliente (chat, main)
+│   │
+│   ├── uploads/                    Imágenes subidas por el usuario (servidas como estáticos)
+│   │
+│   └── views/                      Plantillas Handlebars (SSR)
+│       ├── layouts/
+│       │   ├── main.hbs            Layout principal (navbar + sidebar)
+│       │   └── auth.hbs            Layout de autenticación (centrado)
+│       ├── partials/
+│       │   ├── chat.hbs            Widget de chat en tiempo real
+│       │   └── errores.hbs         Partial reutilizable de mensajes de error
+│       ├── auth/
+│       │   ├── login.hbs
+│       │   └── registro.hbs
+│       ├── productos/
+│       │   ├── lista.hbs
+│       │   ├── nuevo.hbs
+│       │   └── editar.hbs
+│       ├── index.hbs               Dashboard con estadísticas de inventario
+│       └── perfil.hbs              Perfil de usuario y cambio de contraseña
 │
 └── frontend/
     ├── index.html
-    ├── vite.config.js          Alias @ → src/, proxy /api → localhost:3000
+    ├── vite.config.js              Alias @ → src/, proxy /api → localhost:3000
     │
     └── src/
-        ├── main.js             Punto de entrada Vue
-        ├── App.vue             Raíz: AppNav + RouterView (Suspense) + AppFooter
+        ├── main.js                 Punto de entrada Vue
+        ├── App.vue                 Raíz: AppNav + RouterView (Suspense) + AppFooter
         │
         ├── api/
-        │   └── index.js        Capa HTTP centralizada (fetch wrapper)
+        │   └── index.js            Capa HTTP centralizada (fetch wrapper)
         │
         ├── assets/
-        │   └── css/
-        │       └── main.css    Variables CSS globales, tema claro/oscuro, tipografía
+        │   └── css/main.css        Variables CSS globales, tema claro/oscuro, tipografía
         │
         ├── router/
-        │   └── index.js        Definición de rutas con lazy-loading
+        │   └── index.js            Definición de rutas con lazy-loading
         │
         ├── components/
-        │   ├── AppNav.vue      Topbar typewriter + navbar + barra de categorías
-        │   ├── AppFooter.vue   Barra de confianza + pie de página
-        │   ├── AppLoader.vue   Indicador de carga (fallback Suspense)
-        │   └── ProductCard.vue Tarjeta de producto del catálogo
+        │   ├── AppNav.vue          Topbar typewriter + navbar + barra de categorías
+        │   ├── AppFooter.vue       Barra de confianza + pie de página
+        │   ├── AppLoader.vue       Indicador de carga (fallback Suspense)
+        │   └── ProductCard.vue     Tarjeta de producto del catálogo
         │
         ├── composables/
         │   ├── useApi.js           Wrapper reactivo para peticiones async (loading/error/data)
@@ -84,15 +145,15 @@ MercApp/
         │   ├── useCategories.js    Cache singleton de categorías (compartida entre componentes)
         │   ├── useProductForm.js   Estado + validación del formulario de producto
         │   ├── useProducts.js      Catálogo reactivo con filtros q y categoryId
-        │   └── useRecentlyViewed.js Historial de productos vistos (localStorage, máx. 5)
+        │   └── useRecentlyViewed.js  Historial de productos vistos (localStorage, máx. 5)
         │
         └── views/
-            ├── HomeView.vue        Catálogo: carrusel hero, sidebar de filtros, grid, historial
+            ├── HomeView.vue          Catálogo: carrusel hero, sidebar de filtros, grid, historial
             ├── ProductDetailView.vue Detalle individual con botón "Añadir al carrito"
-            ├── ProductFormView.vue  Formulario de creación y edición de productos
-            ├── CartView.vue        Resumen del carrito con cantidades y total
-            ├── AboutView.vue       Página institucional
-            └── NotFoundView.vue    404 genérico
+            ├── ProductFormView.vue   Formulario de creación y edición de productos
+            ├── CartView.vue          Resumen del carrito con cantidades y total
+            ├── AboutView.vue         Página institucional
+            └── NotFoundView.vue      404 genérico
 ```
 
 ---
@@ -235,18 +296,64 @@ Los IDs numéricos de la base de datos nunca se exponen al cliente. El módulo `
 ### Requisitos
 
 - Node.js ≥ 18
-- pnpm (frontend) / npm (backend)
+- MongoDB corriendo localmente (o URI remota)
+- npm (backend) / pnpm (frontend)
 
-### Backend
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/jorgerivera12/MercAppV1.git
+cd MercAppV1
+```
+
+### 2. Backend
 
 ```bash
 cd backend
 npm install
-node seed.js       # poblar la base de datos con productos de prueba
-npm run dev        # nodemon — recarga automática en puerto 3000
 ```
 
-### Frontend
+Crear el archivo de variables de entorno:
+
+```bash
+cp .env.example .env
+```
+
+Editar `.env` con tus valores:
+
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/mercapp
+PORT=3000
+SESSION_SECRET=cambia_esto_por_un_secreto_seguro
+```
+
+Poblar la base de datos con datos de prueba (categorías, productos y usuario admin):
+
+```bash
+npm run seed
+```
+
+El script es idempotente: puede ejecutarse varias veces sin duplicar datos. Al finalizar habrá:
+
+- 5 categorías y 12 productos de muestra
+- Un usuario administrador listo para iniciar sesión:
+
+| Campo      | Valor            |
+|------------|------------------|
+| Email      | admin@gmail.com  |
+| Contraseña | 123456           |
+
+> Si el usuario ya existía, el seed lo elimina y lo vuelve a crear con la contraseña indicada.
+
+Iniciar el servidor:
+
+```bash
+npm run dev        # nodemon — recarga automática en puerto 3000
+# o en producción:
+npm start
+```
+
+### 3. Frontend
 
 ```bash
 cd frontend
@@ -260,11 +367,13 @@ Abrir [http://localhost:5173](http://localhost:5173). El proxy de Vite redirige 
 
 ## Variables de entorno (backend)
 
-| Variable    | Por defecto                       | Descripción                          |
-|-------------|-----------------------------------|--------------------------------------|
-| `HASH_SALT` | `mA_7xRz_sEcRet_s4lt_2024!`       | Salt para la codificación de IDs     |
+| Variable         | Ejemplo                              | Descripción                              |
+|------------------|--------------------------------------|------------------------------------------|
+| `MONGO_URI`      | `mongodb://127.0.0.1:27017/mercapp`  | URI de conexión a MongoDB                |
+| `PORT`           | `3000`                               | Puerto donde escucha Express             |
+| `SESSION_SECRET` | `un_secreto_seguro`                  | Clave para firmar las cookies de sesión  |
 
-Se recomienda definirlo en un archivo `.env` en producción y nunca commitearlo.
+Crear un archivo `.env` en `backend/` a partir de `.env.example`. Nunca commitear el `.env` real.
 
 ---
 
