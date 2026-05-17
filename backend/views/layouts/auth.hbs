@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} — MiInventarioExpress</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  {{{body}}}
+  <script>
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input   = btn.closest('.input-password').querySelector('input');
+        const eyeOn   = btn.querySelector('.icon-eye');
+        const eyeOff  = btn.querySelector('.icon-eye-off');
+        const visible = input.type === 'text';
+
+        input.type        = visible ? 'password' : 'text';
+        eyeOn.style.display  = visible ? '' : 'none';
+        eyeOff.style.display = visible ? 'none' : '';
+        btn.setAttribute('aria-label', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
+      });
+    });
+  </script>
+</body>
+</html>

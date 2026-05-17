@@ -1,198 +1,142 @@
-# MercApp — Backend API
+# Mi Inventario Express
 
-API REST construida con **Node.js + Express** que sirve el catálogo de productos de MercApp. Los datos se persisten en un archivo JSON local (`data/db.json`). El carrito de compras se mantiene en memoria (se reinicia al reiniciar el servidor).
-
----
-
-## Requisitos
-
-| Herramienta | Versión mínima |
-|-------------|----------------|
-| Node.js     | 18.x           |
-| pnpm        | 9.x            |
-
-> Si no tenés `pnpm` instalado, instalalo globalmente con npm:
-> ```bash
-> npm install -g pnpm
-> ```
-> Luego cerrá y volvé a abrir la terminal para que el comando quede disponible.
+Sistema de inventario desarrollado con Node.js, Express y MongoDB siguiendo el patrón MVC.
 
 ---
 
-## Instalación
+## Datos del Estudiante
+
+| Campo | Detalle |
+|---|---|
+| Nombre | Jorge Rivera |
+| Correo | jriveray@est.ups.edu.ec |
+| Materia | Aplicaciones Web |
+| Ciclo | Cuarto Ciclo |
+| Institución | Universidad Politécnica Salesiana (UPS) |
+
+## Repositorio
+
+[https://github.com/jorgerivera12/mi_inventario_express.git](https://github.com/jorgerivera12/mi_inventario_express.git)
+
+---
+
+## Funcionalidades Implementadas
+
+### Autenticación de Usuarios
+- Registro de nuevos usuarios con validación de campos
+- Inicio de sesión con verificación de contraseña (bcrypt)
+- Cierre de sesión
+- Protección de rutas mediante middleware de autenticación
+
+### Gestión de Productos (CRUD)
+- Listar todos los productos del inventario
+- Crear nuevo producto con nombre, descripción, precio, cantidad e imagen
+- Editar y actualizar datos de un producto existente
+- Eliminar producto
+
+### Subida de Imágenes
+- Carga de imágenes por producto con Multer
+- Validación de tipo de archivo (`.jpg`, `.jpeg`, `.png`, `.webp`) y tamaño máximo de 2 MB
+- Almacenamiento en la carpeta `uploads/`
+
+### Perfil de Usuario
+- Ver datos del perfil
+- Actualizar contraseña
+
+### Chat en Tiempo Real
+- Chat privado entre usuarios registrados mediante Socket.io
+- Historial de conversaciones por usuario
+- Lista de usuarios conectados en tiempo real
+
+### Validación de Formularios
+- Validación del lado del servidor con express-validator
+- Mensajes de error sin perder los datos ingresados
+
+---
+
+## Instrucciones de Uso
+
+### Requisitos previos
+
+- Node.js v18 o superior
+- MongoDB corriendo localmente o URI de MongoDB Atlas
+
+### 1. Instalar dependencias
 
 ```bash
-# Desde la raíz del proyecto
-cd backend
-
-# Instalar dependencias (incluye nodemon como devDependency)
-pnpm install
-
-# Poblar la base de datos con datos de prueba
-pnpm seed
+npm install
 ```
 
----
+### 3. Configurar variables de entorno
 
-## Levantar el servidor
-
-### Modo desarrollo (con recarga automática)
+Copia el archivo de ejemplo y completa los valores:
 
 ```bash
-pnpm dev
+cp .env.example .env
 ```
 
-> Requiere `nodemon`. Si no está instalado: `pnpm add -D nodemon`
+Edita `.env` con tus datos:
 
-### Modo producción
+```
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/mi_inventario
+SESSION_SECRET=tu_clave_secreta
+```
+
+### 4. Ejecutar la aplicación
 
 ```bash
-pnpm start
+# Desarrollo (con recarga automática)
+npm run dev
+
+# Producción
+npm start
 ```
 
-El servidor queda disponible en: **http://localhost:3000**
+El servidor estará disponible en `http://localhost:3000`
+
+### 5. Uso básico
+
+1. Accede a `http://localhost:3000/auth/registro` y crea una cuenta.
+2. Inicia sesión en `http://localhost:3000/auth/login`.
+3. Desde el dashboard puedes agregar, editar y eliminar productos.
+4. Usa el chat para comunicarte con otros usuarios registrados.
 
 ---
 
-## Estructura de carpetas
+## Estructura del Proyecto
 
 ```
-backend/
-├── server.js          # Entry point — solo inicia el servidor
-├── app.js             # Express: middleware, rutas y manejo de errores
-├── routes/
-│   ├── categories.js  # GET /api/categories
-│   ├── products.js    # CRUD /api/products
-│   └── cart.js        # Carrito en memoria /api/cart
-├── lib/
-│   └── db.js          # Helpers: readDB, writeDB, nextId
-└── data/
-    └── db.json        # Base de datos JSON
+mi_inventario_express/
+├── app.js               ← servidor Express + Socket.io
+├── models/              ← M (Model) → esquemas de Mongoose
+├── routes/              ← rutas HTTP
+│   ├── index.js
+│   ├── auth.js
+│   └── productos.js
+├── controllers/         ← lógica del CRUD y login
+│   ├── indexController.js
+│   ├── authController.js
+│   └── productoController.js
+├── middleware/          ← autenticación, validaciones, upload
+├── views/               ← V (View) → plantillas Handlebars (.hbs)
+│   ├── layouts/
+│   │   └── main.hbs
+│   └── partials/
+├── public/              ← archivos estáticos (CSS, JS del cliente)
+│   ├── css/
+│   └── js/
+└── uploads/             ← imágenes subidas por el usuario
 ```
 
----
+## Tecnologías
 
-## Endpoints
-
-### Categorías
-
-| Método | Ruta              | Descripción             |
-|--------|-------------------|-------------------------|
-| GET    | `/api/categories` | Lista todas las categorías |
-
----
-
-### Productos
-
-| Método | Ruta                 | Descripción                        |
-|--------|----------------------|------------------------------------|
-| GET    | `/api/products`      | Lista productos (con filtros)      |
-| GET    | `/api/products/:id`  | Detalle de un producto             |
-| POST   | `/api/products`      | Crea un producto                   |
-| PUT    | `/api/products/:id`  | Reemplaza un producto completo     |
-| PATCH  | `/api/products/:id`  | Actualización parcial              |
-| DELETE | `/api/products/:id`  | Elimina un producto                |
-
-#### Filtros disponibles en `GET /api/products`
-
-| Query param  | Tipo   | Descripción                                      |
-|--------------|--------|--------------------------------------------------|
-| `categoryId` | number | Filtra por categoría (`?categoryId=1`)           |
-| `q`          | string | Busca en nombre y descripción (`?q=bluetooth`)   |
-
-Los filtros se pueden combinar: `?categoryId=1&q=auricular`
-
-#### Campos del producto
-
-| Campo         | Tipo   | Obligatorio | Descripción                         |
-|---------------|--------|-------------|-------------------------------------|
-| `name`        | string | Sí          | Nombre del producto (no vacío)      |
-| `price`       | number | Sí          | Precio mayor a 0                    |
-| `categoryId`  | number | Sí          | ID de categoría existente           |
-| `description` | string | No          | Descripción del producto            |
-| `imageUrl`    | string | No          | URL de la imagen                    |
-| `stock`       | number | No          | Entero no negativo (default: 0)     |
-
----
-
-### Carrito (en memoria)
-
-El carrito se reinicia cuando el servidor se detiene.
-
-| Método | Ruta                        | Descripción                          |
-|--------|-----------------------------|--------------------------------------|
-| GET    | `/api/cart`                 | Contenido del carrito y total        |
-| POST   | `/api/cart/items`           | Agrega un producto al carrito        |
-| PUT    | `/api/cart/items/:productId`| Actualiza la cantidad de un ítem     |
-| DELETE | `/api/cart/items/:productId`| Elimina un ítem del carrito          |
-| DELETE | `/api/cart`                 | Vacía el carrito completo            |
-
-#### Body para `POST /api/cart/items`
-
-```json
-{
-  "productId": 1,
-  "quantity": 2
-}
-```
-
-#### Respuesta de `GET /api/cart`
-
-```json
-{
-  "items": [
-    {
-      "product": { "id": 1, "name": "Auriculares Bluetooth", "price": 59.99, "..." },
-      "quantity": 2
-    }
-  ],
-  "total": 119.98
-}
-```
-
----
-
-## Códigos de respuesta
-
-| Código | Situación                                      |
-|--------|------------------------------------------------|
-| 200    | Operación exitosa                              |
-| 201    | Recurso creado (POST)                          |
-| 204    | Eliminación exitosa (sin cuerpo)               |
-| 400    | Datos inválidos o campos obligatorios faltantes|
-| 404    | Recurso o ruta no encontrada                   |
-| 500    | Error interno del servidor                     |
-
----
-
-## Ejemplos rápidos con curl
-
-```bash
-# Listar categorías
-curl http://localhost:3000/api/categories
-
-# Buscar productos por texto
-curl "http://localhost:3000/api/products?q=bluetooth"
-
-# Filtrar por categoría + búsqueda
-curl "http://localhost:3000/api/products?categoryId=1&q=smart"
-
-# Detalle de un producto
-curl http://localhost:3000/api/products/1
-
-# Crear producto
-curl -X POST http://localhost:3000/api/products \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Teclado Mecánico","price":89.99,"categoryId":1,"stock":20}'
-
-# Agregar al carrito
-curl -X POST http://localhost:3000/api/cart/items \
-  -H "Content-Type: application/json" \
-  -d '{"productId":1,"quantity":2}'
-
-# Ver carrito
-curl http://localhost:3000/api/cart
-
-# Vaciar carrito
-curl -X DELETE http://localhost:3000/api/cart
-```
+- **Node.js** + **Express** — servidor HTTP
+- **MongoDB** + **Mongoose** — base de datos
+- **Handlebars** — motor de vistas
+- **Socket.io** — comunicación en tiempo real
+- **bcrypt** — hash de contraseñas
+- **express-session** — manejo de sesiones
+- **multer** — subida de archivos
+- **express-validator** — validación de formularios
+- **dotenv** — variables de entorno
