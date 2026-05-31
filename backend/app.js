@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express    = require('express');
+const cors       = require('cors');
 const { engine } = require('express-handlebars');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
@@ -31,6 +32,12 @@ app.engine('hbs', engine({
 }));
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
+
+// CORS
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 
 // Middlewares globales
 app.use(express.json());
@@ -66,6 +73,11 @@ app.use('/productos', require('./middleware/autenticado'), require('./routes/web
 app.use('/api/categories', require('./routes/api/categories'));
 app.use('/api/products',   require('./routes/api/products'));
 app.use('/api/cart',       require('./routes/api/cart'));
+
+// Health check
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // 404 y error handler para la API
 app.use('/api', (req, res) => {

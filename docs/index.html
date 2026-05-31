@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MercApp — Micrositio del Proyecto</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #e63946;
+      --bg: #f8f9fa;
+      --card: #ffffff;
+      --text: #212529;
+      --muted: #6c757d;
+      --border: #dee2e6;
+      --code-bg: #f1f3f5;
+    }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    header { background: var(--accent); color: #fff; padding: 2.5rem 1.5rem; text-align: center; }
+    header h1 { font-size: 2.4rem; letter-spacing: -0.5px; }
+    header p  { margin-top: .5rem; opacity: .88; font-size: 1.05rem; }
+    main { max-width: 900px; margin: 2rem auto; padding: 0 1.25rem; display: grid; gap: 2rem; }
+    section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.75rem; }
+    h2 { font-size: 1.25rem; margin-bottom: 1rem; color: var(--accent); }
+    h3 { font-size: 1rem; margin: 1.2rem 0 .5rem; color: var(--text); }
+    p, li { font-size: .95rem; color: var(--text); }
+    ul { padding-left: 1.4rem; }
+    li { margin-bottom: .3rem; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: var(--code-bg); border-radius: 4px; padding: .15em .4em; font-size: .88em; font-family: 'Courier New', monospace; }
+    pre { background: var(--code-bg); border-radius: 8px; padding: 1rem 1.2rem; overflow-x: auto; font-size: .87em; line-height: 1.5; margin: .75rem 0; }
+    /* Architecture diagram */
+    .arch { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+    .box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: .75rem 1.25rem; text-align: center; font-size: .9rem; }
+    .box strong { display: block; font-size: 1rem; }
+    .box small  { color: var(--muted); font-size: .78rem; }
+    .arrow { font-size: 1.4rem; color: var(--muted); }
+    /* Endpoints table */
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; margin-top: .75rem; }
+    th { background: var(--code-bg); text-align: left; padding: .55rem .8rem; border: 1px solid var(--border); }
+    td { padding: .5rem .8rem; border: 1px solid var(--border); vertical-align: top; }
+    .method { font-weight: 700; font-family: monospace; }
+    .get    { color: #2e7d32; }
+    .post   { color: #1565c0; }
+    .put    { color: #e65100; }
+    .patch  { color: #6a1b9a; }
+    .delete { color: #c62828; }
+    /* Links section */
+    .links { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: .5rem; }
+    .btn { display: inline-block; background: var(--accent); color: #fff; padding: .55rem 1.2rem; border-radius: 6px; font-size: .9rem; text-decoration: none; transition: opacity .15s; }
+    .btn:hover { opacity: .85; text-decoration: none; }
+    .btn.outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+    footer { text-align: center; padding: 2rem; color: var(--muted); font-size: .85rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>MercApp</h1>
+  <p>Plataforma de comercio electrónico · Vue 3 + Express + MongoDB</p>
+  <p style="margin-top:.3rem;font-size:.85rem;opacity:.75;">Jorge Rivera · UPS Cuarto Ciclo · Aplicaciones Web</p>
+</header>
+
+<main>
+
+  <!-- DESCRIPCIÓN -->
+  <section>
+    <h2>Descripción del sistema</h2>
+    <p>
+      MercApp es una SPA (Single Page Application) de comercio electrónico que permite listar, filtrar,
+      crear y editar productos por categoría, gestionar un carrito de compras persistente en sesión y
+      visualizar historial de productos vistos recientemente.
+    </p>
+    <h3>Stack tecnológico</h3>
+    <ul>
+      <li><strong>Frontend:</strong> Vue 3, Vue Router 5, Vite 5, Fetch API</li>
+      <li><strong>Backend:</strong> Node.js, Express 5, Mongoose, Socket.io, Multer</li>
+      <li><strong>Base de datos:</strong> MongoDB Atlas (clúster M0, región US‑East)</li>
+      <li><strong>Despliegue:</strong> Railway (API), Netlify (SPA), GitHub Pages (micrositio)</li>
+    </ul>
+  </section>
+
+  <!-- ARQUITECTURA -->
+  <section>
+    <h2>Arquitectura de despliegue</h2>
+    <div class="arch">
+      <div class="box"><strong>Usuario</strong><small>Navegador</small></div>
+      <div class="arrow">→</div>
+      <div class="box"><strong>Netlify</strong><small>Vue 3 SPA<br/>HTTPS + CDN</small></div>
+      <div class="arrow">→ HTTPS/CORS →</div>
+      <div class="box"><strong>Railway</strong><small>Express API<br/>Node.js</small></div>
+      <div class="arrow">→</div>
+      <div class="box"><strong>MongoDB Atlas</strong><small>M0 Cluster<br/>TLS</small></div>
+    </div>
+    <pre>Netlify (frontend)
+  └── GET /api/*  →  Railway (backend)
+                       └── mongoose  →  MongoDB Atlas
+                       └── /uploads  →  imágenes locales</pre>
+    <p style="margin-top:.75rem;font-size:.88rem;color:var(--muted);">
+      CORS está configurado para aceptar únicamente el origen de Netlify.<br/>
+      Las variables sensibles viven solo en las plataformas de despliegue, nunca en el repositorio.
+    </p>
+  </section>
+
+  <!-- EJECUCIÓN LOCAL -->
+  <section>
+    <h2>Ejecución local</h2>
+    <h3>1. Requisitos</h3>
+    <ul>
+      <li>Node.js 18+</li>
+      <li>pnpm (<code>npm i -g pnpm</code>)</li>
+      <li>Cuenta MongoDB Atlas o instancia local</li>
+    </ul>
+
+    <h3>2. Backend</h3>
+    <pre>cd backend
+cp .env.example .env        # Completar MONGODB_URI y SESSION_SECRET
+npm install
+npm run dev                 # http://localhost:3000</pre>
+
+    <h3>3. Seed (datos de prueba)</h3>
+    <pre>npm run seed</pre>
+
+    <h3>4. Frontend</h3>
+    <pre>cd frontend
+cp .env.example .env.development   # VITE_API_URL=http://localhost:3000/api
+pnpm install
+pnpm run dev               # http://localhost:5173</pre>
+
+    <h3>5. Build de producción (frontend)</h3>
+    <pre>pnpm run build     # genera frontend/dist/
+pnpm run preview   # previsualización local del build</pre>
+  </section>
+
+  <!-- ENDPOINTS -->
+  <section>
+    <h2>Tabla de endpoints</h2>
+
+    <h3>Categorías — <code>/api/categories</code></h3>
+    <table>
+      <thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th><th>Ejemplo response</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/categories</code></td>
+          <td>Lista todas las categorías</td>
+          <td><code>[{"_id":"…","nombre":"Electrónica"}]</code></td>
+        </tr>
+        <tr>
+          <td><span class="method post">POST</span></td>
+          <td><code>/api/categories</code></td>
+          <td>Crear categoría</td>
+          <td><code>{"_id":"…","nombre":"Ropa"}</code></td>
+        </tr>
+        <tr>
+          <td><span class="method delete">DELETE</span></td>
+          <td><code>/api/categories/:id</code></td>
+          <td>Eliminar categoría</td>
+          <td><code>204 No Content</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Productos — <code>/api/products</code></h3>
+    <table>
+      <thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th><th>Parámetros / body</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/products</code></td>
+          <td>Listar productos (filtros opcionales)</td>
+          <td><code>?categoria=&amp;search=&amp;page=</code></td>
+        </tr>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/products/:id</code></td>
+          <td>Detalle de un producto</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><span class="method post">POST</span></td>
+          <td><code>/api/products</code></td>
+          <td>Crear producto</td>
+          <td><code>{"nombre","precio","categoria","descripcion"}</code></td>
+        </tr>
+        <tr>
+          <td><span class="method put">PUT</span></td>
+          <td><code>/api/products/:id</code></td>
+          <td>Reemplazar producto</td>
+          <td>Body completo del producto</td>
+        </tr>
+        <tr>
+          <td><span class="method patch">PATCH</span></td>
+          <td><code>/api/products/:id</code></td>
+          <td>Actualización parcial</td>
+          <td>Campos a actualizar</td>
+        </tr>
+        <tr>
+          <td><span class="method delete">DELETE</span></td>
+          <td><code>/api/products/:id</code></td>
+          <td>Eliminar producto</td>
+          <td><code>204 No Content</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Carrito — <code>/api/cart</code></h3>
+    <table>
+      <thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method get">GET</span></td><td><code>/api/cart</code></td><td>Obtener carrito de la sesión</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/cart/items</code></td><td>Agregar ítem <code>{"productId","quantity"}</code></td></tr>
+        <tr><td><span class="method put">PUT</span></td><td><code>/api/cart/items/:productId</code></td><td>Actualizar cantidad</td></tr>
+        <tr><td><span class="method delete">DELETE</span></td><td><code>/api/cart/items/:productId</code></td><td>Eliminar ítem</td></tr>
+        <tr><td><span class="method delete">DELETE</span></td><td><code>/api/cart</code></td><td>Vaciar carrito</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Health check</h3>
+    <table>
+      <thead><tr><th>Método</th><th>Ruta</th><th>Response</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/health</code></td>
+          <td><code>{"status":"ok","timestamp":"…"}</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ENLACES -->
+  <section>
+    <h2>URLs del proyecto</h2>
+    <div class="links">
+      <a class="btn" href="https://tu-app.netlify.app" target="_blank" rel="noopener">
+        Frontend (Netlify)
+      </a>
+      <a class="btn outline" href="https://tu-api.railway.app/health" target="_blank" rel="noopener">
+        API Backend (Railway)
+      </a>
+      <a class="btn outline" href="https://github.com/tu-usuario/MercApp" target="_blank" rel="noopener">
+        Repositorio GitHub
+      </a>
+    </div>
+    <p style="margin-top:1rem;font-size:.85rem;color:var(--muted);">
+      Reemplaza las URLs anteriores con las URLs reales asignadas por Railway y Netlify tras el despliegue.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <p>MercApp · Jorge Rivera · Universidad Politécnica Salesiana · 2025</p>
+</footer>
+
+</body>
+</html>

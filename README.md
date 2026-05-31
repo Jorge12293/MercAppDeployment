@@ -340,8 +340,8 @@ Los IDs numéricos de la base de datos nunca se exponen al cliente. El módulo `
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/jorgerivera12/MercAppV1.git
-cd MercAppV1
+git clone https://github.com/Jorge12293/MercAppDeployment.git
+cd MercAppDeployment
 ```
 
 ### 2. Backend
