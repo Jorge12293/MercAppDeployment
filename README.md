@@ -14,7 +14,7 @@ Aplicación de comercio electrónico de página única (SPA) construida con Vue 
 | Institución | Universidad Politécnica Salesiana (UPS) |
 
 
-**Repositorio:** [https://github.com/jorgerivera12/MercAppV1.git](https://github.com/jorgerivera12/MercAppV1.git)
+**Repositorio:** [https://github.com/Jorge12293/MercAppDeployment.git](https://github.com/Jorge12293/MercAppDeployment.git)
 
 ---
 
